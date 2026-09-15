@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AdminPro Dashboard</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--txt:#182033;--muted:#718096;--line:#e4e8ef;--pri:#5b5ce2;--side:#111827;--good:#10b981;--bad:#ef4444;--warn:#f59e0b}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45;background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}body.dark{--bg:#0f172a;--card:#182235;--txt:#f5f7fb;--muted:#9aa8bc;--line:#2b374b;--side:#0b1120}
+aside{position:fixed;inset:0 auto 0 0;width:235px;background:var(--side);color:#fff;padding:18px;z-index:5}.brand{font-size:23px;font-weight:bold;margin:5px 8px 25px}.brand i{color:#8586ff;font-style:normal}.nav button{display:block;width:100%;border:0;background:none;color:#aeb8ca;text-align:left;padding:11px;border-radius:8px;margin:3px 0;cursor:pointer}.nav button:hover,.nav .active{background:#2b2f58;color:white}.nav small{display:block;color:#667085;margin:18px 8px 5px;text-transform:uppercase}
+main{margin-left:235px;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.top h1{margin:0}.actions{display:flex;gap:7px}button,.input,select,input,textarea{font:inherit}.btn,.input,select,input,textarea{border:1px solid var(--line);background:var(--card);color:var(--txt);border-radius:8px;padding:9px 11px}.btn{cursor:pointer}.primary{background:var(--pri);border-color:var(--pri);color:#fff}.danger{background:var(--bad);color:#fff;border-color:var(--bad)}.mobile{display:none}
+.page{display:none}.page.active{display:block}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px;margin-bottom:13px}.stat h2{margin:8px 0}.muted{color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:2fr 1fr;gap:13px}.chart{height:245px;display:flex;align-items:end;gap:10px;padding:15px 5px 0;border-bottom:1px solid var(--line)}.bw{flex:1;height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center}.bar{width:70%;max-width:42px;background:linear-gradient(#8586fa,var(--pri));border-radius:6px 6px 0 0}.bw span{font-size:10px;color:var(--muted);padding:5px}.table{overflow:auto}.table table{width:100%;min-width:700px;border-collapse:collapse}.table th,.table td{padding:11px;border-bottom:1px solid var(--line);text-align:left;font-size:12px}.badge{padding:4px 7px;border-radius:20px;font-size:10px;font-weight:bold}.ok{background:#dcfce7;color:#087f51}.warn{background:#fff2d5;color:#9a6200}.bad{background:#fee2e2;color:#b42318}.tools{display:flex;gap:8px;margin-bottom:12px}.search{flex:1}.empty{text-align:center;padding:30px;color:var(--muted)}.actions-cell button{border:0;background:none;cursor:pointer;padding:5px;color:var(--muted)}
+.modal-bg{display:none;position:fixed;inset:0;background:#0008;z-index:20;place-items:center}.modal-bg.show{display:grid}.modal{width:min(500px,94%);background:var(--card);border-radius:13px;padding:18px}.form{display:grid;gap:10px}.form input,.form select,.form textarea{width:100%;margin-top:4px}.foot{text-align:right;margin-top:12px}.toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;padding:11px 15px;border-radius:8px;display:none;z-index:30}.toast.show{display:block}
+@media(max-width:800px){aside{transform:translateX(-100%);transition:.2s}aside.open{transform:none}main{margin-left:0}.mobile{display:inline-block}.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
+@media(max-width:500px){.stats{grid-template-columns:1fr}.tools{flex-wrap:wrap}.top .primary{display:none}}
+
+body{transition:background .25s,color .25s}.card,.btn,.input,select,input,textarea,aside{transition:background .2s,color .2s,border-color .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px #0001}.card{box-shadow:0 2px 10px #00000008}
+
+.add-menu{position:fixed;right:20px;top:72px;width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:7px;box-shadow:0 12px 35px #0002;z-index:15;display:none}.add-menu.show{display:block}.add-menu button{width:100%;border:0;background:none;color:var(--txt);padding:10px;text-align:left;border-radius:7px;cursor:pointer}.add-menu button:hover{background:var(--bg)}
+.notif-panel{position:fixed;right:20px;top:72px;width:300px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:0 12px 35px #0002;z-index:15;display:none}.notif-panel.show{display:block}.notif-item{padding:10px;border-bottom:1px solid var(--line);font-size:12px}.profile{display:flex;align-items:center;gap:8px}.avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--pri);color:#fff;font-weight:bold}
+
+.kpi{position:relative;overflow:hidden}.kpi .icon{position:absolute;right:15px;top:15px;font-size:24px;opacity:.6}.trend{font-size:11px;margin-left:6px}.up{color:var(--good)}.down{color:var(--bad)}
+.filterbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.filterbar>*{min-width:120px}
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.mini{font-size:12px;color:var(--muted)}
+.task-col{background:var(--bg);padding:12px;border-radius:10px;min-height:180px}.task{background:var(--card);padding:10px;border:1px solid var(--line);border-radius:8px;margin:7px 0}
+.ticket{padding:12px;border:1px solid var(--line);border-radius:9px;margin:8px 0}.pill{display:inline-block;padding:3px 7px;border-radius:20px;background:var(--bg);font-size:10px}
+
+.auth-bg{position:fixed;inset:0;background:linear-gradient(135deg,rgba(17,24,39,.72),rgba(91,92,226,.62));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:grid;place-items:center;z-index:99999;padding:15px}
+.auth-box{width:min(430px,94vw);background:var(--card);color:var(--txt);padding:30px;border-radius:20px;box-shadow:0 25px 80px #0006;animation:authIn .25s ease}
+@keyframes authIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.auth-title{text-align:center;font-size:28px;font-weight:800;margin:0}.auth-title span{color:var(--pri)}
+.auth-sub{text-align:center;color:var(--muted);font-size:13px;margin:6px 0 22px}.auth-error{color:var(--bad);font-size:12px;min-height:18px;margin-top:6px}
+.auth-switch{text-align:center;margin-top:16px;color:var(--muted);font-size:12px}.auth-switch button{border:0;background:none;color:var(--pri);font-weight:700;cursor:pointer}
+.auth-step{display:none}.auth-step.active{display:block}.password-wrap{position:relative}.password-wrap input{padding-right:65px}.show-pass{position:absolute;right:8px;top:8px;border:0;background:none;color:var(--muted);cursor:pointer;padding:6px}
+.auth-note{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px;font-size:11px;color:var(--muted);margin-top:12px}
+
+html,body{min-height:100%;margin:0}
+body.auth-locked{overflow:hidden;height:100vh}
+.auth-bg{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;overflow:hidden!important}
+.auth-card{max-height:calc(100vh - 32px);overflow:auto;scrollbar-width:none}
+.auth-card::-webkit-scrollbar{display:none}
+
+.nav button{display:flex;align-items:center;gap:10px;transition:background .18s ease,color .18s ease,transform .18s ease}.nav button:hover{transform:translateX(2px)}
+.nav-icon{width:19px;height:19px;display:inline-grid;place-items:center;flex:0 0 19px;font-size:15px;font-weight:600;opacity:.9;border:1px solid currentColor;border-radius:5px;line-height:1}
+.top .btn{min-width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px}.top .primary{padding-inline:13px}.btn{transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease}.btn:active{transform:translateY(0) scale(.98)}
+.card{box-shadow:0 5px 18px rgba(15,23,42,.05)}.dark .card{box-shadow:0 5px 18px rgba(0,0,0,.12)}
+input,select,textarea{outline:none;transition:border-color .18s ease,box-shadow .18s ease}.form input:focus,.form select:focus,.form textarea:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(91,92,226,.10)}
+.auth-bg{background:radial-gradient(circle at 15% 20%,rgba(99,102,241,.30),transparent 28%),radial-gradient(circle at 85% 75%,rgba(56,189,248,.20),transparent 30%),linear-gradient(135deg,#0b1020 0%,#151b35 48%,#0b1224 100%)!important}
+
+/* FINAL POLISH */
+:root{--font:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+html,body,button,input,select,textarea{font-family:var(--font)}
+aside{overflow:hidden;display:flex;flex-direction:column}
+.nav{height:calc(100vh - 76px);overflow-y:auto;overflow-x:hidden;padding-right:2px;scrollbar-width:thin;scrollbar-color:#38435b transparent}
+.nav::-webkit-scrollbar{width:6px}.nav::-webkit-scrollbar-thumb{background:#38435b;border-radius:10px}
+.nav button{min-height:42px;padding:10px 11px}.nav-icon{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 22px;border:0;border-radius:7px}.nav-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.top .mobile{display:inline-flex!important;min-width:38px}.top .mobile svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.icon-btn{position:relative;width:40px;height:40px;padding:0}.icon-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.notif-btn #ncount{position:absolute;right:4px;top:3px;min-width:15px;height:15px;padding:0 4px;border-radius:99px;background:#ef4444;color:#fff;font-size:9px;line-height:15px;font-weight:800;border:2px solid var(--card)}
+.notif-btn.empty #ncount{display:none}
+.theme-btn{background:var(--card);border-color:var(--line)}
+#menu{background:var(--card);border-color:var(--line)}
+/* Sidebar collapse on desktop; slide on small screens */
+aside.collapsed{width:78px;padding-left:12px;padding-right:12px}aside.collapsed .brand{font-size:0;text-align:center;margin-left:0;margin-right:0}aside.collapsed .brand i{font-size:18px}aside.collapsed .nav small,aside.collapsed .nav button{font-size:0}aside.collapsed .nav button{justify-content:center;padding-left:0;padding-right:0;gap:0}aside.collapsed .nav-icon{margin:0}
+body.sidebar-collapsed main{margin-left:78px}
+@media(max-width:800px){aside{width:235px;transform:translateX(-100%)}aside.open{transform:translateX(0)}aside.collapsed{width:235px;padding:18px;transform:translateX(-100%)}aside.collapsed.open{transform:translateX(0)}body.sidebar-collapsed main{margin-left:0}main{padding:14px}.top{gap:8px}.top h1{font-size:20px}}
+@media(min-width:801px){.top .mobile{display:inline-flex!important}}
+@media(max-width:500px){.actions{gap:5px}.icon-btn{width:37px;height:37px}.top .primary{display:none}}
+
+/* VIEWPORT / SCROLL POLISH */
+html,body{width:100%;height:100%;overflow:hidden}
+body{overscroll-behavior:none}
+main{height:100vh;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#c5ccda transparent}
+main::-webkit-scrollbar{width:7px}main::-webkit-scrollbar-thumb{background:#c5ccda;border-radius:20px}body.dark main{scrollbar-color:#39465e transparent}body.dark main::-webkit-scrollbar-thumb{background:#39465e}
+aside{height:100vh;min-height:0}
+.nav{height:auto;min-height:0;flex:1;overflow-y:auto;overscroll-behavior:contain}
+.top{position:sticky;top:0;z-index:20;padding:4px 0 14px;background:var(--bg)}
+.top .icon-btn{background:var(--card);border-color:var(--line);box-shadow:0 2px 8px rgba(15,23,42,.06)}
+.top .icon-btn:hover{background:var(--bg);box-shadow:0 5px 14px rgba(15,23,42,.10);transform:translateY(-1px)}
+.menu-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+.notif-btn #ncount{right:50%;top:-5px;transform:translateX(50%);min-width:17px;height:17px;padding:0 5px;border:2px solid var(--card);font-size:9px;line-height:13px;display:flex;align-items:center;justify-content:center;z-index:2}
+.notif-btn{overflow:visible!important}
+.notif-btn svg{width:20px;height:20px}
+.theme-btn{background:linear-gradient(180deg,var(--card),var(--bg))!important}
+#refresh{background:linear-gradient(180deg,var(--card),var(--bg))!important}
+@media(max-width:800px){main{height:100vh;overflow-y:auto}.top{padding-top:0}.top .mobile{display:inline-flex!important}}
+</style></head><body>
+<aside id="side"><div class="brand">Admin<i>Pro</i></div><div class="nav">
+<small>Main</small>
+<button class="active" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5M9 21v-6h6v6"/></svg></span>Dashboard</button>
+<button data-page="analytics"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 2 5-6"/></svg></span>Analytics</button>
+<button data-page="calendar"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 10h18"/></svg></span>Calendar</button>
+<small>Management</small>
+<button data-page="users"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20c.8-3.2 3.1-5 7-5s6.2 1.8 7 5"/></svg></span>Users</button>
+<button data-page="customers"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c.6-3 2.4-4.7 5.5-4.7S14 17 14.5 20M16 11c2.5 0 4 1.4 4.5 3.8M16 5.5a2.5 2.5 0 0 1 0 5"/></svg></span>Customers</button>
+<button data-page="products"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 7 8-4 8 4-8 4-8-4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/></svg></span>Products</button>
+<button data-page="orders"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>Orders</button>
+<button data-page="inventory"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>Inventory</button>
+<button data-page="suppliers"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4zM7 8V5h10v3"/><path d="M8 12h8M8 15h5"/></svg></span>Suppliers</button>
+<button data-page="categories"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>Categories</button>
+<small>Business</small>
+<button data-page="reports"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h10l4 4v14H5z"/><path d="M14 3v5h5M8 17v-5M12 17V9M16 17v-3"/></svg></span>Reports</button>
+<button data-page="payments"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h4"/></svg></span>Payments</button>
+<button data-page="invoices"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>Invoices</button>
+<button data-page="expenses"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M8 12h8"/></svg></span>Expenses</button>
+<button data-page="coupons"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7a2 2 0 0 0 0 4v2a2 2 0 0 0 0 4h16V7H4Z"/><path d="M13 10h.01M16 14h.01"/></svg></span>Coupons</button>
+<button data-page="support"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 16 0v5a2 2 0 0 1-2 2h-3v-6h5"/><path d="M4 13H2v3a2 2 0 0 0 2 2h2v-5"/></svg></span>Support</button>
+<button data-page="tasks"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8 12 2.5 2.5L16 9"/></svg></span>Tasks</button>
+<button data-page="activity"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg></span>Activity</button>
+<button data-page="settings"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .4 2l.1.1-1.8 1.8-.1-.1a1.8 1.8 0 0 0-2-.4 1.8 1.8 0 0 0-1.1 1.7v.2h-2.6v-.2a1.8 1.8 0 0 0-1.1-1.7 1.8 1.8 0 0 0-2 .4l-.1.1-1.8-1.8.1-.1a1.8 1.8 0 0 0 .4-2 1.8 1.8 0 0 0-1.7-1.1H4v-2.6h.2A1.8 1.8 0 0 0 5.9 10a1.8 1.8 0 0 0-.4-2l-.1-.1 1.8-1.8.1.1a1.8 1.8 0 0 0 2 .4A1.8 1.8 0 0 0 10.4 5v-.2H13V5a1.8 1.8 0 0 0 1.1 1.7 1.8 1.8 0 0 0 2-.4l.1-.1L18 8l-.1.1a1.8 1.8 0 0 0-.4 2 1.8 1.8 0 0 0 1.7 1.1h.2v2.6h-.2a1.8 1.8 0 0 0-1.8 1.2Z"/></svg></span>Settings</button></div></aside>
+<main><header class="top"><div><button class="btn icon-btn menu-btn mobile" id="menu" aria-label="Toggle sidebar" title="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><h1 id="title" style="display:inline;margin-left:7px">Dashboard</h1></div><div class="actions">
+<button class="btn icon-btn" id="refresh" aria-label="Refresh" title="Refresh"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0 1 4"/><path d="M20 5v6h-6"/></svg></button>
+<button class="btn icon-btn theme-btn" id="theme" aria-label="Theme" title="Toggle theme"><svg viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/><circle cx="12" cy="12" r="3.5"/></svg></button>
+<button class="btn icon-btn notif-btn" id="notify" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span id="ncount">3</span></button>
+<button class="btn primary" id="addTop">＋ Add</button></div></header>
+
+<section class="page active" id="dashboard"><div class="stats">
+<div class="card stat">Revenue<h2 id="rev">$0</h2><span class="muted">Total orders</span></div>
+<div class="card stat">Orders<h2 id="ord">0</h2><span class="muted">All orders</span></div>
+<div class="card stat">Users<h2 id="usr">0</h2><span class="muted">Registered users</span></div>
+<div class="card stat">Products<h2 id="prd">0</h2><span class="muted" id="stockmsg">Stock</span></div></div>
+<div class="card"><div class="stat-grid"><div><span class="mini">Profit</span><h3 id="profit">$0</h3></div><div><span class="mini">Avg. Order</span><h3 id="aov">$0</h3></div><div><span class="mini">Conversion</span><h3>4.8%</h3></div><div><span class="mini">Customers</span><h3 id="custCount">0</h3></div><div><span class="mini">Low Stock</span><h3 id="lowDash">0</h3></div></div></div><div class="grid"><div class="card"><h3>Revenue Overview</h3><div class="chart" id="chart"></div></div><div class="card"><h3>Quick Actions</h3><p><button class="btn primary" onclick="openUser()">+ User</button></p><p><button class="btn" onclick="openProduct()">+ Product</button></p><p><button class="btn" onclick="openOrder()">+ Order</button></p><p><button class="btn" onclick="exportCSV('orders')">⬇ Export Orders</button></p></div></div>
+<div class="grid"><div class="card"><h3>Recent Orders</h3><div class="table"><table><thead><tr><th>ID</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead><tbody id="recent"></tbody></table></div></div><div class="card"><h3>Low Stock</h3><div id="lowList"></div></div></div></section>
+
+<section class="page" id="analytics"><div class="card"><h3>Analytics</h3><div class="chart" id="achart"></div></div><div class="card"><h3>Traffic Sources</h3><p>Organic <b style="float:right">46%</b></p><p>Social <b style="float:right">28%</b></p><p>Direct <b style="float:right">18%</b></p></div></section>
+
+<section class="page" id="users"><div class="card"><div class="top"><h3>Users</h3><button class="btn primary" onclick="openUser()">+ Add User</button></div><div class="tools"><input class="search" id="us" placeholder="Search users"><select id="ur"><option value="">All roles</option><option>Admin</option><option>Manager</option><option>Staff</option><option>Customer</option></select></div><div class="table"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ut"></tbody></table></div></div></section>
+
+<section class="page" id="customers"><div class="card"><h3>Customers</h3><div class="tools"><input class="search" id="cs" placeholder="Search customers"></div><div class="table"><table><thead><tr><th>Name</th><th>Email</th><th>Orders</th><th>Spent</th><th>Action</th></tr></thead><tbody id="ct"></tbody></table></div></div></section>
+
+<section class="page" id="products"><div class="card"><div class="top"><h3>Products</h3><button class="btn primary" onclick="openProduct()">+ Add Product</button></div><div class="tools"><input class="search" id="ps" placeholder="Search products"><select id="pc"><option value="">All categories</option></select></div><div class="table"><table><thead><tr><th>Name</th><th>Category</th><th>SKU</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody id="pt"></tbody></table></div></div></section>
+
+<section class="page" id="orders"><div class="card"><div class="top"><h3>Orders</h3><div><button class="btn primary" onclick="openOrder()">+ Add Order</button> <button class="btn" onclick="exportCSV('orders')">CSV</button></div></div><div class="tools"><input class="search" id="os" placeholder="Search orders"><select id="of"><option value="">All status</option><option>Pending</option><option>Processing</option><option>Delivered</option><option>Cancelled</option></select></div><div class="table"><table><thead><tr><th>ID</th><th>Customer</th><th>Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ot"></tbody></table></div></div></section>
+
+<section class="page" id="inventory"><div class="stats"><div class="card">SKUs<h2 id="skus">0</h2></div><div class="card">Low Stock<h2 id="low">0</h2></div><div class="card">Out of Stock<h2 id="out">0</h2></div><div class="card">Value<h2 id="ival">$0</h2></div></div><div class="card"><div class="table"><table><thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Status</th><th>Action</th></tr></thead><tbody id="it"></tbody></table></div></div></section>
+
+
+<section class="page" id="payments"><div class="card"><div class="top"><h3>Payments</h3><button class="btn" onclick="exportCSV('orders')">Export CSV</button></div><div class="stats"><div class="card">Paid<h2 id="paidTotal">$0</h2></div><div class="card">Pending<h2 id="pendingTotal">$0</h2></div><div class="card">Refunded<h2>$0</h2></div></div><div class="table"><table><thead><tr><th>Transaction</th><th>Order</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead><tbody id="payTable"></tbody></table></div></div></section>
+<section class="page" id="invoices"><div class="card"><div class="top"><h3>Invoices</h3><button class="btn primary" onclick="openInvoice()">＋ Create Invoice</button></div><div class="table"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Order</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody id="invTable"></tbody></table></div></div></section>
+<section class="page" id="support"><div class="card"><div class="top"><h3>Support Tickets</h3><button class="btn primary" onclick="openTicket()">＋ New Ticket</button></div><div class="filterbar"><select id="ticketFilter" onchange="renderTickets()"><option value="">All tickets</option><option>Open</option><option>Pending</option><option>Resolved</option></select></div><div id="ticketList"></div></div></section>
+<section class="page" id="tasks"><div class="card"><div class="top"><h3>Task Board</h3><button class="btn primary" onclick="openTask()">＋ New Task</button></div><div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="task-col"><b>Todo</b><div id="todoCol"></div></div><div class="task-col"><b>In Progress</b><div id="progressCol"></div></div><div class="task-col"><b>Completed</b><div id="doneCol"></div></div></div></div></section>
+<section class="page" id="calendar"><div class="card"><div class="top"><h3>Calendar</h3><button class="btn primary" onclick="openEvent()">＋ Add Event</button></div><div id="calendarList"></div></div></section>
+<section class="page" id="reports"><div class="card"><h3>Reports</h3><p>Download current data as CSV.</p><button class="btn" onclick="exportCSV('orders')">Orders CSV</button> <button class="btn" onclick="exportCSV('products')">Products CSV</button> <button class="btn" onclick="exportCSV('customers')">Customers CSV</button></div></section>
+<section class="page" id="activity"><div class="card"><div class="top"><h3>Activity Logs</h3><button class="btn danger" onclick="logs=[];save();renderLogs()">Clear</button></div><div id="logs"></div></div></section>
+<section class="page" id="settings"><div class="card"><h3>Settings</h3><p>Dark/Light mode is saved automatically.</p><p>Dashboard data is saved in your browser automatically.</p><button class="btn danger" onclick="resetData()">Reset Demo Data</button> <button class="btn" onclick="logout()">Log Out</button></div></section>
+
+<section class="page" id="suppliers"><div class="card"><div class="top"><div><h2 style="margin:0">Suppliers</h2><div class="muted">Manage vendors, contacts and purchasing relationships.</div></div><button class="btn primary" onclick="modal('Add Supplier',supplierForm())">＋ Add Supplier</button></div><div class="table"><table><thead><tr><th>Supplier</th><th>Contact</th><th>Category</th><th>Orders</th><th>Status</th></tr></thead><tbody><tr><td>Nova Tech Supply</td><td>sales@novatech.example</td><td>Electronics</td><td>18</td><td><span class="badge ok">Active</span></td></tr><tr><td>Urban Home Co.</td><td>hello@urbanhome.example</td><td>Home</td><td>9</td><td><span class="badge ok">Active</span></td></tr><tr><td>Prime Apparel</td><td>orders@prime.example</td><td>Clothing</td><td>6</td><td><span class="badge warn">Review</span></td></tr></tbody></table></div></div></section>
+<section class="page" id="categories"><div class="card"><div class="top"><div><h2 style="margin:0">Categories</h2><div class="muted">Organize products and keep the catalog easy to manage.</div></div><button class="btn primary" onclick="modal('Add Category',categoryForm())">＋ Add Category</button></div><div class="stats" id="categoryCards"></div></div></section>
+<section class="page" id="expenses"><div class="stats"><div class="card stat"><span class="muted">This Month</span><h2>$4,280</h2><span class="up">+8.2%</span></div><div class="card stat"><span class="muted">Operating</span><h2>$2,940</h2><span class="muted">68.7% of expenses</span></div><div class="card stat"><span class="muted">Marketing</span><h2>$840</h2><span class="muted">19.6% of expenses</span></div><div class="card stat"><span class="muted">Other</span><h2>$500</h2><span class="muted">11.7% of expenses</span></div></div><div class="card"><div class="top"><div><h2 style="margin:0">Expenses</h2><div class="muted">Track business spending and monthly costs.</div></div><button class="btn primary" onclick="modal('Add Expense',expenseForm())">＋ Add Expense</button></div><div class="table"><table><thead><tr><th>Description</th><th>Category</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody><tr><td>Cloud hosting</td><td>Operating</td><td>Sep 12, 2026</td><td>$420.00</td><td><span class="badge ok">Paid</span></td></tr><tr><td>Ad campaign</td><td>Marketing</td><td>Sep 09, 2026</td><td>$840.00</td><td><span class="badge ok">Paid</span></td></tr><tr><td>Office supplies</td><td>Other</td><td>Sep 06, 2026</td><td>$180.00</td><td><span class="badge warn">Pending</span></td></tr></tbody></table></div></div></section>
+<section class="page" id="coupons"><div class="card"><div class="top"><div><h2 style="margin:0">Coupons & Discounts</h2><div class="muted">Create promotional codes and monitor their usage.</div></div><button class="btn primary" onclick="modal('Create Coupon',couponForm())">＋ Create Coupon</button></div><div class="table"><table><thead><tr><th>Code</th><th>Discount</th><th>Uses</th><th>Expires</th><th>Status</th></tr></thead><tbody><tr><td><b>WELCOME10</b></td><td>10%</td><td>124</td><td>Oct 01, 2026</td><td><span class="badge ok">Active</span></td></tr><tr><td><b>VIP20</b></td><td>20%</td><td>48</td><td>Oct 15, 2026</td><td><span class="badge ok">Active</span></td></tr><tr><td><b>SUMMER25</b></td><td>25%</td><td>310</td><td>Aug 31, 2026</td><td><span class="badge bad">Expired</span></td></tr></tbody></table></div></div></section>
+</main>
+
+<div class="modal-bg" id="mb"><div class="modal"><div class="top"><h3 id="mt">Add</h3><button class="btn" onclick="closeModal()">✕</button></div><div id="mf"></div></div></div><div class="toast" id="toast"></div>
+
+
+<div class="add-menu" id="addMenu">
+  <button onclick="openUser();closeAddMenu()">👤 Add User</button>
+  <button onclick="openProduct();closeAddMenu()">📦 Add Product</button>
+  <button onclick="openOrder();closeAddMenu()">🛒 Add Order</button><button onclick="openTicket();closeAddMenu()">🎫 Add Ticket</button><button onclick="openTask();closeAddMenu()">✅ Add Task</button><button onclick="openEvent();closeAddMenu()">🗓 Add Event</button>
+  <button onclick="showPageFromMenu('reports');closeAddMenu()">📑 Create Report</button>
+</div>
+<div class="notif-panel" id="notifPanel">
+  <h3 style="margin:4px 0 8px">Notifications</h3>
+  <div class="notif-item">📦 2 products are low in stock.</div>
+  <div class="notif-item">🛒 New order received.</div>
+  <div class="notif-item">👤 New user registered.</div>
+  <button class="btn" style="margin-top:9px;width:100%" onclick="clearNotifications()">Mark all as read</button>
+</div>
+
+<div class="auth-bg" id="authBg">
+  <div class="auth-box">
+    <div class="auth-step active" id="createStep">
+      <h1 class="auth-title">Admin<span>Pro</span></h1>
+      <div class="auth-sub">Sign in to create your account to continue</div>
+      <form class="form" id="createAccountForm">
+        <label>Full Name<input id="createName" type="text" placeholder="Your name" required></label>
+        <label>Email<input id="createEmail" type="email" placeholder="admin@example.com" required></label>
+        <label>Password<div class="password-wrap"><input id="createPassword" type="password" placeholder="Minimum 6 characters" minlength="6" required><button type="button" class="show-pass" onclick="togglePass('createPassword',this)">Show</button></div></label>
+        <label>Confirm Password<div class="password-wrap"><input id="createConfirm" type="password" placeholder="Repeat password" required><button type="button" class="show-pass" onclick="togglePass('createConfirm',this)">Show</button></div></label>
+        <div class="auth-error" id="createError"></div>
+        <button class="btn primary" style="width:100%;padding:12px">Sign In</button>
+      </form>
+      <div class="auth-switch">Already registered? <button type="button" onclick="showLoginStep()">Login</button></div>
+      <div class="auth-note">Your demo account is stored only in this browser using LocalStorage.</div>
+    </div>
+
+    <div class="auth-step" id="loginStep">
+      <h1 class="auth-title">Welcome <span>Back</span></h1>
+      <div class="auth-sub">Login to open your admin dashboard</div>
+      <form class="form" id="loginAccountForm">
+        <label>Email<input id="loginEmail2" type="email" placeholder="Your email" required></label>
+        <label>Password<div class="password-wrap"><input id="loginPassword2" type="password" placeholder="Your password" required><button type="button" class="show-pass" onclick="togglePass('loginPassword2',this)">Show</button></div></label>
+        <div class="auth-error" id="loginError2"></div>
+        <button class="btn primary" style="width:100%;padding:12px">Login to Dashboard</button>
+      </form>
+      <div class="auth-switch">Don't have an account? <button type="button" onclick="showCreateStep()">Sign In</button></div>
+      <div class="auth-note" id="loginHint">Create an account first, then use the same email and password here.</div>
+    </div>
+  </div>
+</div>
+
+
+<script src="app.js" defer></script></body></html>
